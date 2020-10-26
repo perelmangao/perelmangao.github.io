@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>WebGL渲染管线 | Peiwen&#39;s page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="着色器(shader)是一种运行在GPU上的代码块，这些小程序为图形渲染管线的某个特定部分而运行。着色器只有输入输出而无法进行相互通信。 图形绘制管线12345678910st&#x3D;&gt;start: 开始e&#x3D;&gt;end: 结束op1&#x3D;&gt;operation: 顶点op2&#x3D;&gt;operation: 顶点处理模块op3&#x3D;&gt;operat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebGL渲染管线">
+<meta property="og:url" content="https://github.com/perelmangao/perelmangao.github.io/2020/10/24/WebGL%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/index.html">
+<meta property="og:site_name" content="Peiwen&#39;s page">
+<meta property="og:description" content="着色器(shader)是一种运行在GPU上的代码块，这些小程序为图形渲染管线的某个特定部分而运行。着色器只有输入输出而无法进行相互通信。 图形绘制管线12345678910st&#x3D;&gt;start: 开始e&#x3D;&gt;end: 结束op1&#x3D;&gt;operation: 顶点op2&#x3D;&gt;operation: 顶点处理模块op3&#x3D;&gt;operat">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://learnopengl-cn.github.io/img/01/04/pipeline.png">
+<meta property="article:published_time" content="2020-10-24T14:08:10.000Z">
+<meta property="article:modified_time" content="2020-10-26T10:44:36.890Z">
+<meta property="article:author" content="Peiwen Gao">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://learnopengl-cn.github.io/img/01/04/pipeline.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Peiwen&#39;s page" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Peiwen&#39;s page</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/perelmangao/perelmangao.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="[post]-WebGL渲染管线" class="article article-type-[post]" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/10/24/WebGL%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" class="article-date">
+  <time datetime="2020-10-24T14:08:10.000Z" itemprop="datePublished">2020-10-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      WebGL渲染管线
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>着色器(shader)是一种运行在GPU上的代码块，这些小程序为图形渲染管线的某个特定部分而运行。着色器只有输入输出而无法进行相互通信。</p>
+<h3 id="图形绘制管线"><a href="#图形绘制管线" class="headerlink" title="图形绘制管线"></a>图形绘制管线</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">st&#x3D;&gt;start: 开始</span><br><span class="line">e&#x3D;&gt;end: 结束</span><br><span class="line">op1&#x3D;&gt;operation: 顶点</span><br><span class="line">op2&#x3D;&gt;operation: 顶点处理模块</span><br><span class="line">op3&#x3D;&gt;operation: 裁剪数据和图元组装模块</span><br><span class="line">op4&#x3D;&gt;operation: 光栅化模块</span><br><span class="line">op5&#x3D;&gt;operation: 片元处理模块</span><br><span class="line">op6&#x3D;&gt;operation: 像素</span><br><span class="line"></span><br><span class="line">st-&gt;op1-&gt;op2-&gt;op3-&gt;op4-&gt;op5-&gt;op6-&gt;e</span><br></pre></td></tr></table></figure>
+
+<h4 id="顶点处理"><a href="#顶点处理" class="headerlink" title="顶点处理"></a>顶点处理</h4><p>在顶点处理模块中，对各个顶点的处理是彼此独立的。顶点着色器主要计算每个顶点的色值并且改变每个顶点的其他属性，对顶点坐标数据进行坐标变换。</p>
+<p><img src="https://learnopengl-cn.github.io/img/01/04/pipeline.png" alt=""></p>
+<p>在传入顶点数据时，顶点数据按OpenGL所必须的三维坐标数据(x, y, z)进行输入。OpenGL不是简单地把<strong>所有的</strong>3D坐标变换为屏幕上的2D像素；OpenGL仅当3D坐标在3个轴（x、y和z）上都为-1.0到1.0的范围内时才处理它。所有在所谓的标准化设备坐标(Normalized Device Coordinates)范围内的坐标才会最终呈现在屏幕上（在这个范围以外的坐标都不会显示）。</p>
+<p>我们通过顶点缓冲对象(Vertex Buffer Objects, VBO)管理这个内存，它会在GPU内存（通常被称为显存）中储存大量顶点。使用这些缓冲对象的好处是我们可以一次性的发送一大批数据到显卡上，而不是每个顶点发送一次。从CPU把数据发送到显卡相对较慢，所以只要可能我们都要尝试尽量一次性发送尽可能多的数据。当数据发送至显卡的内存中后，顶点着色器几乎能立即访问顶点，这是个非常快的过程。</p>
+<p>顶点缓冲对象就像OpenGL中的其它对象一样，这个缓冲有一个独一无二的ID，所以我们可以使用glGenBuffers函数和一个缓冲ID生成一个VBO对象：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">unsigned int VBO;</span><br><span class="line">glGenBuffers(1, &amp;VBO);</span><br></pre></td></tr></table></figure>
+
+<p>OpenGL有很多缓冲对象类型，顶点缓冲对象的缓冲类型是GL_ARRAY_BUFFER。OpenGL允许我们同时绑定多个缓冲，只要它们是不同的缓冲类型。我们可以使用glBindBuffer函数把新创建的缓冲绑定到GL_ARRAY_BUFFER目标上：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glBindBuffer(GL_ARRAY_BUFFER, VBO);</span><br></pre></td></tr></table></figure>
+
+<p>从这一刻起，我们使用的任何（在GL_ARRAY_BUFFER目标上的）缓冲调用都会用来配置当前绑定的缓冲(VBO)。然后我们可以调用glBufferData函数，它会把之前定义的顶点数据复制到缓冲的内存中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);</span><br></pre></td></tr></table></figure>
+
+<p>glBufferData是一个专门用来把用户定义的数据复制到当前绑定缓冲的函数。它的第一个参数是目标缓冲的类型：顶点缓冲对象当前绑定到GL_ARRAY_BUFFER目标上。第二个参数指定传输数据的大小(以字节为单位)；用一个简单的<code>sizeof</code>计算出顶点数据大小就行。第三个参数是我们希望发送的实际数据。</p>
+<p>第四个参数指定了我们希望显卡如何管理给定的数据。它有三种形式：</p>
+<ul>
+<li>GL_STATIC_DRAW ：数据不会或几乎不会改变。</li>
+<li>GL_DYNAMIC_DRAW：数据会被改变很多。</li>
+<li>GL_STREAM_DRAW ：数据每次绘制时都会改变。</li>
+</ul>
+<p>三角形的位置数据不会改变，每次渲染调用时都保持原样，所以它的使用类型最好是GL_STATIC_DRAW。如果，比如说一个缓冲中的数据将频繁被改变，那么使用的类型就是GL_DYNAMIC_DRAW或GL_STREAM_DRAW，这样就能确保显卡把数据放在能够高速写入的内存部分。</p>
+<p>顶点着色器(Vertex Shader)是几个可编程着色器中的一个。如果我们打算做渲染的话，现代OpenGL需要我们至少设置一个顶点和一个片段着色器。用着色器语言GLSL(OpenGL Shading Language)编写顶点着色器，然后编译这个着色器，这样就可以在程序中使用它了。</p>
+<h4 id="裁剪和图元组装"><a href="#裁剪和图元组装" class="headerlink" title="裁剪和图元组装"></a>裁剪和图元组装</h4><p>因为成像系统不能做到一次性对整个场景成像，基于这个限制，裁剪是必须的。人类的视网膜对应90°的视域，虚拟相机（camera）对应的视域可以通过选择不同的镜头调节，调节方式为<strong>裁剪体</strong>（clipping volume）。位于裁剪体内部的对象投影后成像，位于裁剪体外的对象被裁剪不会成像。</p>
+<p>裁剪必须针对逐个图元而不是顶点来进行，在图形绘制管线里必须将顶点转化为多边形或线段这样的图元，这一阶段会输出投影被成像的图元。</p>
+<h4 id="光栅化"><a href="#光栅化" class="headerlink" title="光栅化"></a>光栅化</h4><p>由裁剪模块得到的图元仍然是用顶点表示的，为了生成帧缓存中的像素还必须做进一步处理。例如，如果三个顶点确定了一个由单色填充的三角形，光栅化模块就必须确定在帧缓存中有哪些像素位于这个三角形的内部。我们将在第8章讨论线段和多边形的光栅化（扫描转换）过程。 光栅化模块对每个图元输出一组片元（fragment)。可以把片元看成是携带相关信息的潜在像素，片元所携带的信息包括它的颜色和位置，使用这些信息来更新帧缓存中对应位置的像素。片元还可以携带深度信息，这样在绘制流水线后面的阶段就可以确定某个片元是否位于其他片元的后面，这些片元都对应于同一个像素。</p>
+<h4 id="片元处理"><a href="#片元处理" class="headerlink" title="片元处理"></a>片元处理</h4><p>图形绘制管线最后一个模块利用上一个模块生成的片元来更新帧缓存中的像素。如果应用程序生成的是三维数据，在这一模块会对片元的可见性进行处理</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/perelmangao/perelmangao.github.io/2020/10/24/WebGL%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" data-id="ckgqfki860000zp63g6uk87p0" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/12/31/%E6%96%B0%E5%B9%B4%E7%AF%87/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">新年篇</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%94%9F%E6%B4%BB-%E7%88%B1/" rel="tag">生活 爱</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/%E7%94%9F%E6%B4%BB-%E7%88%B1/" style="font-size: 10px;">生活 爱</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/10/24/WebGL%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/">WebGL渲染管线</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/31/%E6%96%B0%E5%B9%B4%E7%AF%87/">新年篇</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/31/world/">Happy new year!</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Peiwen Gao<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
