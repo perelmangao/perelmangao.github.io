@@ -7,12 +7,12 @@
   
   <title>WebGL渲染管线 | Peiwen&#39;s page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="着色器(shader)是一种运行在GPU上的代码块，这些小程序为图形渲染管线的某个特定部分而运行。着色器只有输入输出而无法进行相互通信。 图形绘制管线12345678910st&#x3D;&gt;start: 开始e&#x3D;&gt;end: 结束op1&#x3D;&gt;operation: 顶点op2&#x3D;&gt;operation: 顶点处理模块op3&#x3D;&gt;operat">
+  <meta name="description" content="着色器(shader)是一种运行在GPU上的代码块，这些小程序为图形渲染管线的某个特定部分而运行。着色器只有输入输出而无法进行相互通信。 图形绘制管线  顶点处理在顶点处理模块中，对各个顶点的处理是彼此独立的。顶点着色器主要计算每个顶点的色值并且改变每个顶点的其他属性，对顶点坐标数据进行坐标变换。  在传入顶点数据时，顶点数据按OpenGL所必须的三维坐标数据(x, y, z)进行输入。OpenG">
 <meta property="og:type" content="article">
 <meta property="og:title" content="WebGL渲染管线">
 <meta property="og:url" content="https://github.com/perelmangao/perelmangao.github.io/2020/10/24/WebGL%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/index.html">
 <meta property="og:site_name" content="Peiwen&#39;s page">
-<meta property="og:description" content="着色器(shader)是一种运行在GPU上的代码块，这些小程序为图形渲染管线的某个特定部分而运行。着色器只有输入输出而无法进行相互通信。 图形绘制管线12345678910st&#x3D;&gt;start: 开始e&#x3D;&gt;end: 结束op1&#x3D;&gt;operation: 顶点op2&#x3D;&gt;operation: 顶点处理模块op3&#x3D;&gt;operat">
+<meta property="og:description" content="着色器(shader)是一种运行在GPU上的代码块，这些小程序为图形渲染管线的某个特定部分而运行。着色器只有输入输出而无法进行相互通信。 图形绘制管线  顶点处理在顶点处理模块中，对各个顶点的处理是彼此独立的。顶点着色器主要计算每个顶点的色值并且改变每个顶点的其他属性，对顶点坐标数据进行坐标变换。  在传入顶点数据时，顶点数据按OpenGL所必须的三维坐标数据(x, y, z)进行输入。OpenG">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://learnopengl-cn.github.io/img/01/04/pipeline.png">
 <meta property="article:published_time" content="2020-10-24T14:08:10.000Z">
@@ -91,7 +91,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>着色器(shader)是一种运行在GPU上的代码块，这些小程序为图形渲染管线的某个特定部分而运行。着色器只有输入输出而无法进行相互通信。</p>
-<h3 id="图形绘制管线"><a href="#图形绘制管线" class="headerlink" title="图形绘制管线"></a>图形绘制管线</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">st&#x3D;&gt;start: 开始</span><br><span class="line">e&#x3D;&gt;end: 结束</span><br><span class="line">op1&#x3D;&gt;operation: 顶点</span><br><span class="line">op2&#x3D;&gt;operation: 顶点处理模块</span><br><span class="line">op3&#x3D;&gt;operation: 裁剪数据和图元组装模块</span><br><span class="line">op4&#x3D;&gt;operation: 光栅化模块</span><br><span class="line">op5&#x3D;&gt;operation: 片元处理模块</span><br><span class="line">op6&#x3D;&gt;operation: 像素</span><br><span class="line"></span><br><span class="line">st-&gt;op1-&gt;op2-&gt;op3-&gt;op4-&gt;op5-&gt;op6-&gt;e</span><br></pre></td></tr></table></figure>
+<h3 id="图形绘制管线"><a href="#图形绘制管线" class="headerlink" title="图形绘制管线"></a>图形绘制管线</h3><div id="flowchart-0" class="flow-chart"></div>
 
 <h4 id="顶点处理"><a href="#顶点处理" class="headerlink" title="顶点处理"></a>顶点处理</h4><p>在顶点处理模块中，对各个顶点的处理是彼此独立的。顶点着色器主要计算每个顶点的色值并且改变每个顶点的其他属性，对顶点坐标数据进行坐标变换。</p>
 <p><img src="https://learnopengl-cn.github.io/img/01/04/pipeline.png" alt=""></p>
@@ -119,11 +119,20 @@
 <p>裁剪必须针对逐个图元而不是顶点来进行，在图形绘制管线里必须将顶点转化为多边形或线段这样的图元，这一阶段会输出投影被成像的图元。</p>
 <h4 id="光栅化"><a href="#光栅化" class="headerlink" title="光栅化"></a>光栅化</h4><p>由裁剪模块得到的图元仍然是用顶点表示的，为了生成帧缓存中的像素还必须做进一步处理。例如，如果三个顶点确定了一个由单色填充的三角形，光栅化模块就必须确定在帧缓存中有哪些像素位于这个三角形的内部。我们将在第8章讨论线段和多边形的光栅化（扫描转换）过程。 光栅化模块对每个图元输出一组片元（fragment)。可以把片元看成是携带相关信息的潜在像素，片元所携带的信息包括它的颜色和位置，使用这些信息来更新帧缓存中对应位置的像素。片元还可以携带深度信息，这样在绘制流水线后面的阶段就可以确定某个片元是否位于其他片元的后面，这些片元都对应于同一个像素。</p>
 <h4 id="片元处理"><a href="#片元处理" class="headerlink" title="片元处理"></a>片元处理</h4><p>图形绘制管线最后一个模块利用上一个模块生成的片元来更新帧缓存中的像素。如果应用程序生成的是三维数据，在这一模块会对片元的可见性进行处理</p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js"></script><textarea id="flowchart-0-code" style="display: none">st=>start: 开始
+e=>end: 结束
+op1=>operation: 顶点
+op2=>operation: 顶点处理模块
+op3=>operation: 裁剪数据和图元组装模块
+op4=>operation: 光栅化模块
+op5=>operation: 片元处理模块
+op6=>operation: 像素
 
+st->op1->op2->op3->op4->op5->op6->e</textarea><textarea id="flowchart-0-options" style="display: none">{"scale":1,"line-width":2,"line-length":50,"text-margin":10,"font-size":12}</textarea><script>  var code = document.getElementById("flowchart-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("flowchart-0-options").value));  var diagram = flowchart.parse(code);  diagram.drawSVG("flowchart-0", options);</script>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/perelmangao/perelmangao.github.io/2020/10/24/WebGL%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" data-id="ckgqfoqgr00016s63cx1td16s" class="article-share-link">Share</a>
+      <a data-url="https://github.com/perelmangao/perelmangao.github.io/2020/10/24/WebGL%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" data-id="ckgqgpofw0002046394k3gd5b" class="article-share-link">Share</a>
       
       
     </footer>
